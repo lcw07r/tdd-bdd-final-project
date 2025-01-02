@@ -1,3 +1,5 @@
+
+
 # Copyright 2016, 2023 John J. Rofrano. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +29,7 @@ import os
 import logging
 import unittest
 from decimal import Decimal
-from service.models import Product, Category, db
+from service.models import Product, Category, db, DataValidationError
 from service import app
 from tests.factories import ProductFactory
 
@@ -101,7 +103,6 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(new_product.available, product.available)
         self.assertEqual(new_product.category, product.category)
 
-    
     def test_read_a_product(self):
         """It should Read a Product"""
         product = ProductFactory()
@@ -132,7 +133,7 @@ class TestProductModel(unittest.TestCase):
         products = Product.all()
         self.assertEqual(len(products), 1)
         self.assertEqual(products[0].id, original_id)
-        self.assertEqual(products[0].description, "testing")    
+        self.assertEqual(products[0].description, "testing")
 
     def test_delete_a_product(self):
         """It should Delete a Product"""
@@ -191,7 +192,64 @@ class TestProductModel(unittest.TestCase):
         for product in found:
             self.assertEqual(product.category, category)
 
+    def test_find_by_price(self):
+        """It should Find a Product by Price"""
+        products = ProductFactory.create_batch(5)
+        for product in products:
+            product.create()
+        price = products[0].price
+        count = len([product for product in products if product.price == price])
+        found = Product.find_by_price(price)
+        self.assertEqual(found.count(), count)
+        for product in found:
+            self.assertEqual(product.price, price)
 
+    def test_find_by_price_fails_with_type(self):
+        """It should fail with no return"""
+        products = ProductFactory.create_batch(5)
+        for product in products:
+            product.create()
+        price = "aaa"
+        count = len([product for product in products if product.price == price])
+        found = Product.find_by_price(price)
+        # this is not work:
+        self.assertEqual(found.count(), 0)
+        # this is not work either:
+        # with self.assertRaises(DataValidationError):
+        #     Product.find_by_price(price)
+
+
+    def test_update_fails_with_id(self):
+        """ It should raise an error """
+        product = ProductFactory()
+        product.id = None
+        product.create()
+        self.assertIsNotNone(product.id)
+        # Clear the id
+        product.id = None
+        self.assertRaises(DataValidationError, product.update)
+
+    def test_deserialize_fails_with_available(self):
+        """ It should raise an error """
+        data = {'id': 1, 'name': 'name', 'description': 'description', 'price': 0, 'available': 'fail'}
+        product = Product()
+        with self.assertRaises(DataValidationError):
+            product.deserialize(data)
+        # this doesn't work for the assertRaises above: self.assertRaises(DataValidationError, product.deserialize(data))
+
+    def test_deserialize_fails_with_attributeerror(self):
+        """ It should raise an error """
+        data = {'id': 1, 'name': 'name', 'description': 'description', 'price': 0, 'available': True, 'category': 'fail'}
+        product = Product()
+        with self.assertRaises(DataValidationError):
+            product.deserialize(data)
+
+    def test_deserialize_fails_with_typeerror(self):
+        """ It should raise an error """
+        data = None
+        product = Product()
+        with self.assertRaises(DataValidationError):
+            product.deserialize(data)
 
 
 
