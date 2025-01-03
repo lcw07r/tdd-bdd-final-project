@@ -204,21 +204,6 @@ class TestProductModel(unittest.TestCase):
         for product in found:
             self.assertEqual(product.price, price)
 
-#     def test_find_by_price_fails_with_type(self):
-#         """It should fail with no return"""
-#         products = ProductFactory.create_batch(5)
-#         for product in products:
-#             product.create()
-#         price = "aaa"
-#         count = len([product for product in products if product.price == price])
-#         found = Product.find_by_price(price)
-#         # this is not work:
-#         self.assertEqual(found.count(), 0)
-#         # this is not work either:
-#         # with self.assertRaises(DataValidationError):
-#         #     Product.find_by_price(price)
-
-
     def test_update_fails_with_id(self):
         """ It should raise an error """
         product = ProductFactory()
