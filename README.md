@@ -1,3 +1,9 @@
+# Coursera: Introduction to Test and Behavior Driven Development
+
+Course URL: https://www.coursera.org/learn/test-and-behavior-driven-development-tdd-bdd
+Course code repo - labs: https://github.com/ibm-developer-skills-network/duwjx-tdd_bdd_PracticeCode/tree/main/labs
+Course code repo - final project template: https://github.com/ibm-developer-skills-network/xgcyk-tdd-bdd-final-project-template 
+
 # TDD / BDD Final Project Template
 
 This repository contains the template to be used for the Final Project for the Coursera course **Introduction to TDD/BDD**.
